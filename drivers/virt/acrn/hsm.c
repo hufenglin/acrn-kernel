@@ -127,7 +127,8 @@ static long acrn_dev_ioctl(struct file *filp, unsigned int cmd,
 	u64 cstate_cmd;
 	int i, ret = 0;
 
-	if (vm->vmid == ACRN_INVALID_VMID && cmd != ACRN_IOCTL_CREATE_VM) {
+	if ((vm->vmid == ACRN_INVALID_VMID) && (cmd != ACRN_IOCTL_CREATE_VM) &&
+	    (cmd != ACRN_IOCTL_GET_PLATFORM_INFO)) {
 		dev_dbg(acrn_dev.this_device,
 			"ioctl 0x%x: Invalid VM state!\n", cmd);
 		return -EINVAL;
@@ -566,6 +567,7 @@ static int __init hsm_init(void)
 		return ret;
 	}
 	acrn_trace_init();
+	acrn_hvlog_init();
 	return 0;
 }
 
@@ -573,6 +575,7 @@ static void __exit hsm_exit(void)
 {
 	acrn_ioreq_intr_remove();
 	misc_deregister(&acrn_dev);
+	acrn_hvlog_exit();
 	acrn_trace_exit();
 }
 module_init(hsm_init);
